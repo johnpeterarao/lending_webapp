@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  /* background: var(--background);
+  color: var(--foreground); */
+  font-family: Arial, Helvetica, sans-serif;
+}
+@layer components {
+  .form_input {
+    @apply h-[40px] bg-white text-black border-0 rounded-none px-2 w-full;
+  }
+  .form_label {
+    @apply mb-2 uppercase block outline-0;
+  }
+  .form_field {
+    @apply mb-5;
+  }
+  .btn {
+    @apply w-full text-white uppercase text-base px-3 py-2 border-2 
+  }
+  .btn-black {
+    @apply bg-black text-white border-black
+  }
+  .btn-white {
+    @apply bg-white text-black 
+  }
+}
+
+.form_label:focus-visible {
+  outline: 0!important;
+}
+
+.container {
+  max-width: 1360px;
+  padding: 0 20px;
+}
+
+.lendingSidebar {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+  padding: 20px;
+  transform: translate(-103%, 0);
+  transition: 0.3s ease-in-out;
+}
+
+.lendingSidebar.active {
+  transform: translate(0, 0);
+}
