@@ -69,3 +69,7 @@ body {
 .lendingSidebar.active {
   transform: translate(0, 0);
 }
+
+body {
+  font-size: 14px;
+}

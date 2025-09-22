@@ -20,6 +20,7 @@ type CashData = {
     totalPaymentReceived: number;
     expectedMoneyReturn: number;
     totalNgPerangPinautang: number;
+    totalExpectedAmount: number;
 } 
 
 type TestData = {
@@ -34,7 +35,8 @@ const SampleData: TestData = {
         totalMoneyLended: 0,
         totalPaymentReceived: 0,
         expectedMoneyReturn: 0,
-        totalNgPerangPinautang: 0
+        totalNgPerangPinautang: 0,
+        totalExpectedAmount: 0
     },
     availableId: 1
 }
@@ -56,6 +58,8 @@ export default function Ticketmanagement() {
     const [report, setReportData] = useState<ReportData>({ pendingContracts: [], completedContracts: [], cashData: { completedNilabasNaPera: 0, compltedBumalikNaPera: 0, completedKinitangPera: 0, pendingBinayadNaPera: 0, perangBabalik: 0} });
     const [openSidebar, setOpenSidebar] = useState(false);
     const [hasRegistrationError, setHasRegistrationError] = useState({ show: false, errorMessage: ''});
+    const [isCopied, setIsCopied] = useState(false);
+    const [newPastedData, setNewPastedData] = useState<string>('');
     const [formData, setFormData] = useState<Borrowers>( {
         id: 0,
         name: '',
@@ -108,7 +112,8 @@ export default function Ticketmanagement() {
             totalMoneyLended: newData.cashData?.totalMoneyLended,
             totalPaymentReceived: newData.cashData?.totalPaymentReceived + b.monthly,
             expectedMoneyReturn: newData.cashData?.expectedMoneyReturn - b.monthly,
-            totalNgPerangPinautang: newData.cashData?.totalNgPerangPinautang
+            totalNgPerangPinautang: newData.cashData?.totalNgPerangPinautang,
+            totalExpectedAmount: newData?.cashData?.totalExpectedAmount
         }
 
         setData({...newData, borrowers: newBorrowers, cashData: newCashData });
@@ -203,7 +208,8 @@ export default function Ticketmanagement() {
             totalMoneyLended: newData?.cashData.totalMoneyLended + newFormData?.hiniramAmount,
             expectedMoneyReturn: newData.cashData.expectedMoneyReturn + newFormData?.amountNaIbabalik,
             totalPaymentReceived: newData?.cashData?.totalPaymentReceived,
-            totalNgPerangPinautang: newData?.cashData?.totalNgPerangPinautang + newFormData.hiniramAmount
+            totalNgPerangPinautang: newData?.cashData?.totalNgPerangPinautang + newFormData.hiniramAmount,
+            totalExpectedAmount: newData?.cashData?.totalExpectedAmount + newFormData?.amountNaIbabalik
         }
 
         newData.cashData = newCashData;
@@ -229,14 +235,32 @@ export default function Ticketmanagement() {
     const handleTopData = () => {
       return (
         <div className="bg-pink-800 p-5 top-0 fixed left-0 right-0">
-            <h3 className="text-white">Total ng Perang Nasa labas: { formatCurrency(data?.cashData?.expectedMoneyReturn) }</h3>
+            <h3 className="text-white flex flex-wrap justify-between">
+              <div className="w-full"> Perang pinahiram:</div>
+              <div className="w-1/2">Capital: {formatCurrency(data?.cashData?.totalMoneyLended)}</div> 
+              <div className="w-1/2 text-right">With Interest: {formatCurrency(data?.cashData.totalExpectedAmount)}</div>
+            </h3>
+            <h3 className="text-white mt-5">Total ng Perang Sisingilin: { formatCurrency(data?.cashData?.expectedMoneyReturn) }</h3>
             <h3 className="text-white">Total ng Perang binayad: { data?.cashData?.expectedMoneyReturn == 0 && data?.cashData?.totalPaymentReceived == 0 ? data.borrowers?.length ? `All contracts are now paid` : `No contracts are being created` : formatCurrency(data?.cashData?.totalPaymentReceived) }</h3>
         </div>
       )
     }
 
+    const copyJsonValue = () => {
+      const newData = localStorage.getItem("utangan") || "";
+      
+      setIsCopied(true);
+      navigator.clipboard.writeText(newData);
+    }
+
+    const setNewData = () => {
+      setData(JSON.parse(newPastedData));
+      setNewPastedData('');
+      window?.location.reload();
+    }
+
     return (
-        <div className="main pb-[60px] pt-[100px]">
+        <div className="main pb-[100px] pt-[160px]">
             <div className={`lendingSidebar bg-pink-200 ${openSidebar ? 'active' : ''}`}>
                 <div className="form">
                     <div className="form_field">
@@ -286,9 +310,20 @@ export default function Ticketmanagement() {
                         </div>
                     )) }
                 </div>
-                <div className="mt-10 p-5 bg-blue-400">
+                {/* <div className="mt-10 p-5 bg-blue-400">
                     { renderReport() } 
                     <button onClick={() => handleReport()}>Make report</button>
+                </div> */}
+                { data?.borrowers.length ? 
+                  <div className="copy px-5 text-center">
+                    <button className="w-full py-4 px-3 bg-red-400 text-white uppercase" onClick={() => copyJsonValue()}> { !isCopied ? "Copy Data Value" : "Copied!"}</button>
+                  </div>
+                  : null
+                }
+
+                <div className="insertData px-5 text-center mt-10">
+                  <input type="text" className="form_input border-2" onChange={(e) => setNewPastedData(e.currentTarget.value)} />
+                  <button className="mt-3 w-full py-4 px-3 bg-red-400 text-white uppercase" onClick={() => setNewData()}>Submit</button>
                 </div>
             </div>
             <div className="fixed bottom-0 left-0 right-0 ">
